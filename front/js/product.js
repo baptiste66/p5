@@ -45,16 +45,19 @@ const colors = document.getElementById("colors");
   price.textContent = `${useData.price}`;
   description.textContent = `${useData.description}`;
   //récupération du prix dans le panier
+  productBasket.alt=`${useData.altTxt}`
+  productBasket.image=`${useData.imageUrl} `
+  productBasket.name=`${useData.name}`;
   productBasket.price=`${useData.price}`
   //boucle pour couleurs disponible
-  for (let couleur of useData.colors) {
-    colors.innerHTML += `<option value="${couleur}">${couleur}</option>` ;
+  for (let color of useData.colors) {
+    colors.innerHTML += `<option value="${color}">${color}</option>` ;
   }
 };
 productDisplay();
 
 
-//couleur et quantité dynanimique + ajout à la console 
+//choix couleur et quantité 
 //----------------------------------------------------
 let addColor = document.querySelector("#colors");
 let productColor;
@@ -71,26 +74,23 @@ let productColor;
 let quantity = document.getElementById("quantity");
 let productQuantity;
 quantity.addEventListener("input", (q) => {
-  productQuantity = q.data;
+  productQuantity =q.data;
   productBasket.quantity=productQuantity
   document.getElementById("addToCart").style.color = "white";
   document.getElementById("addToCart").textContent = "Ajouter au panier";
 });
 
 
-// conditions + message d'erreur
+// conditions de la selection du produit + message d'erreur
 //------------------------------------------------------------------------
 // déclaration variable
 let addProduct= document.getElementById("addToCart");
 // condition pour ajouter au panier
 addProduct.addEventListener("click", () => {
-  //message d'erreur si >ou<100
-  if (productQuantity < 1 || productQuantity > 100 ||productQuantity === undefined ){
-    alert("veuiller saisir une quantité entre 1 et 100")
-  }
-  // si couleur pas remplis
-  if(productColor === undefined){
-    alert("veuiller choisir une couleur")
+  //message d'erreur si <1ou>100 /pas de couleur 
+  if (productQuantity < 1 || productQuantity > 100 ||productQuantity === undefined ||
+     productColor === undefined||productColor== ""|| productColor==null){
+    alert("veuiller saisir une quantité entre 1 et 100 et/ou une couleur")
   }
   // sinon produit ajouter
   else{
@@ -103,63 +103,55 @@ addProduct.addEventListener("click", () => {
 
 //----------------------------------------------
 //local storage 
-//fonction ajout d'un produit 
 
-function addProductBasket(){
+//si produit deja existant change quantiter + crée nouveaux produit
+function addOtherProduct(){
     // variable pour récupérer le product du basket dans localstorage 
-    let basket = JSON.parse(localStorage.getItem("product"));
-//si panier vide ajoute article dans le panier
-    if (basket==null) {
-      //ouverture tableaux a modifier
-      basket = [];
-      basket.push(productBasket)
-      //envoie les informations des productBasket dans product
-      localStorage.setItem("product",JSON.stringify(basket)); 
+  let basket = JSON.parse(localStorage.getItem("product"));
+  //si panier pas nul 
+   if (basket!=null){  
+    for(let product of basket){
+     //cherche dans le basket si id et color identique
+      let foundProduct= basket.find(product=>product.id==id && product.color==productBasket.color)
+       //et si les id et couleur identique alors additionner la quantiter du produit avec le produit deja existant
+      if(foundProduct!=undefined){
+        let additionQuantité = parseInt(product.quantity) + parseInt(productQuantity);
+        product.quantity = JSON.stringify(additionQuantité);
+       return localStorage.product= JSON.stringify(basket);
+      } 
+      // si différent crée nouveaux produits
+      else if (foundProduct==undefined){
+      return classementProduct()
+      }
     }
   }
+  // si panier vide
+  return addProductBasket();
+} 
 
 //si produit pas vide at aucun id identique pousse le produit dans un nuveaux objet
 function classementProduct(){
   let basket = JSON.parse(localStorage.getItem("product"));
   basket.push(productBasket)
-  // classe les objet par id et si id identique par quantité 
+  // classe les objet par du même id les un a la suite des autres
   basket.sort(function triage(a, b) {
-    if (a._id < b._id) return -1;
-    if (a._id > b._id) return 1;
-    if (a._id = b._id){
-      if (a.quantity < b.quantity) return -1;
-      if (a.quantity > b.quantity) return 1;
-    }
+    if (a.id < b.id) return -1;
+    if (a.id > b.id) return 1;
     return 0;
-  });
+  })
     localStorage.setItem ("product",JSON.stringify(basket));
 }
 
-
-
-  function addOtherProduct(){
-    let basket = JSON.parse(localStorage.getItem("product"));
-    //si panier pas nul 
-     if (basket!=null){  
-      for(let product of basket){
-       //cherche dans le basket si id et color identique
-        let foundProduct= basket.find(product=>product.id==id && product.color==productBasket.color)
-         //et si les id et couleur identique alord additionner la quantiter du produit avec le produit deja existant
-        if(foundProduct!=undefined){
-          let additionQuantité = parseInt(product.quantity) + parseInt(productQuantity);
-          product.quantity = JSON.stringify(additionQuantité);
-         return localStorage.product= JSON.stringify(basket);
-        } 
-        // si différent retourne a la fonction 
-        else if (foundProduct==undefined){
-          return classementProduct();
-          
-        }
-      }
-      
-    }
-    // si le panier est vide seul cette fonction s'effectuera 
-    return addProductBasket();
-} 
-  
+//si panier vide injecte un premier produit
+function addProductBasket(){
+  let basket = JSON.parse(localStorage.getItem("product"));
+//si panier vide ajoute article dans le panier
+  if (basket==null) {
+    //ouverture tableaux a modifier
+    basket = [];
+    basket.push(productBasket)
+    //envoie les informations des productBasket dans product
+    localStorage.setItem("product",JSON.stringify(basket)); 
+  }
+}
 
