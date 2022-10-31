@@ -12,7 +12,6 @@ async function data () {
   await fetch(`http://localhost:3000/api/products/${id}`)
     .then((res) => res.json())
     .then((productData) => {
-      console.table(productData);
     //nom des donnée 
     useData=productData;
     })
@@ -20,7 +19,7 @@ async function data () {
     .catch((err) => {
       document.querySelector(".item").innerHTML = "<h1>erreur 404</h1>";
   });}
-
+data()
 //affichage du produit
 //---------------------------------------------------
 //déclaration tableaux vide modifier par la fonctions suivantes
@@ -44,11 +43,6 @@ const colors = document.getElementById("colors");
   title.textContent = `${useData.name}`;
   price.textContent = `${useData.price}`;
   description.textContent = `${useData.description}`;
-  //récupération du prix dans le panier
-  productBasket.alt=`${useData.altTxt}`
-  productBasket.image=`${useData.imageUrl} `
-  productBasket.name=`${useData.name}`;
-  productBasket.price=`${useData.price}`
   //boucle pour couleurs disponible
   for (let color of useData.colors) {
     colors.innerHTML += `<option value="${color}">${color}</option>` ;
@@ -59,6 +53,7 @@ productDisplay();
 
 //choix couleur et quantité 
 //----------------------------------------------------
+
 let addColor = document.querySelector("#colors");
 let productColor;
   addColor.addEventListener("input", (c) => {
@@ -81,8 +76,10 @@ quantity.addEventListener("input", (q) => {
 });
 
 
+
 // conditions de la selection du produit + message d'erreur
 //------------------------------------------------------------------------
+
 // déclaration variable
 let addProduct= document.getElementById("addToCart");
 // condition pour ajouter au panier
@@ -94,23 +91,51 @@ addProduct.addEventListener("click", () => {
   }
   // sinon produit ajouter
   else{
-    addOtherProduct();
+    addProductBasket();
     console.log("produit ajouté");
     addProduct.style.color = "green";
     addProduct.textContent="produit ajouté"
     alert("Votre produit à bien été enregistré")
   }})
 
+
+
+  //----------------------------------------------
+//donner du panier 
+async function infoBasket(){
+  await data()
+  //récupération du prix dans le panier
+  productBasket.alt=`${useData.altTxt}`
+  productBasket.image=`${useData.imageUrl} `
+  productBasket.name=`${useData.name}`;
+  productBasket.price=`${useData.price}`
+}
+infoBasket()
 //----------------------------------------------
 //local storage 
 
-//si produit deja existant change quantiter + crée nouveaux produit
-function addOtherProduct(){
-    // variable pour récupérer le product du basket dans localstorage 
+//si panier vide injecte un premier produit
+function addProductBasket(){
   let basket = JSON.parse(localStorage.getItem("product"));
-  //si panier pas nul 
-   if (basket!=null){  
+//si panier vide ajoute article dans le panier
+if (basket!=null){
+  return addOtherProduct()}
+  if (basket==null) {
+    //ouverture tableaux a modifier
+    basket = [];
+    basket.push(productBasket)
+    //envoie les informations des productBasket dans product
+    localStorage.setItem("product",JSON.stringify(basket)); 
+  }
+}
+
+
+//si produit deja existant change quantiter + crée nouveaux produit
+  function addOtherProduct(){
+   let basket = JSON.parse(localStorage.getItem("product"));
     for(let product of basket){
+// variable pour récupérer le product du basket dans localstorage 
+    
      //cherche dans le basket si id et color identique
       let foundProduct= basket.find(product=>product.id==id && product.color==productBasket.color)
        //et si les id et couleur identique alors additionner la quantiter du produit avec le produit deja existant
@@ -123,11 +148,10 @@ function addOtherProduct(){
       else if (foundProduct==undefined){
       return classementProduct()
       }
-    }
   }
-  // si panier vide
-  return addProductBasket();
-} 
+}
+
+addOtherProduct
 
 //si produit pas vide at aucun id identique pousse le produit dans un nuveaux objet
 function classementProduct(){
@@ -142,16 +166,4 @@ function classementProduct(){
     localStorage.setItem ("product",JSON.stringify(basket));
 }
 
-//si panier vide injecte un premier produit
-function addProductBasket(){
-  let basket = JSON.parse(localStorage.getItem("product"));
-//si panier vide ajoute article dans le panier
-  if (basket==null) {
-    //ouverture tableaux a modifier
-    basket = [];
-    basket.push(productBasket)
-    //envoie les informations des productBasket dans product
-    localStorage.setItem("product",JSON.stringify(basket)); 
-  }
-}
 

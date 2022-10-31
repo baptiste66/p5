@@ -67,9 +67,10 @@ async function delete_btn (basketDisplay) {
       let totalremove=basket.length
       //si un seul article tous supprimer
       if(totalremove==1){
-        return (localStorage.removeItem("product"))
+       (localStorage.removeItem("product"))
+        location.href = "cart.html";
       }
-      //si plusieur supprimer garder les produit avec id et couleur différent 
+      //si plusieur garder les produit avec id et couleur différent de celui sélectionner
       else{
         //filtre les élément non sélectionner les isole et supprimme le produit sélectionner
         notDelete = basket.filter((basket) => {
@@ -162,3 +163,107 @@ if(basket[i].id === quant.dataset.id &&quant.dataset.color === basket[i].color){
 })
   }
 editQuantity()
+
+
+//--------------------------------------------------------------
+// regex du formulaire
+
+  //variable position
+  formBasket=[]
+  let firstname=document.querySelector("#firstName")
+  let lastname=document.querySelector("#lastName")
+  let address=document.querySelector("#address")
+  let city =document.querySelector("#city")
+  let email =document.querySelector("#email")
+  //variable error
+  let errorFirstName=document.querySelector("#firstNameErrorMsg")
+  let errorLastName=document.querySelector("#lastNameErrorMsg")
+  let errorAdress = document.querySelector("#addressErrorMsg")
+  let errorCity = document.querySelector("#cityErrorMsg")
+  let errorEmail= document.querySelector("#emailErrorMsg")
+  let valueFirstname, valueLastname, valueAddress, valueCity, valueEmail
+  //condition du fomulaire
+  async function regexForm(){
+  firstname.addEventListener("input",(e)=>{
+    if(e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      valueFirstname= e.target.value
+      errorFirstName.innerHTML=""
+    }
+    else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
+      valueFirstname=null
+    }
+  })
+
+  lastname.addEventListener("input",(f)=>{
+    if(f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      valueLastname= f.target.value
+      errorLastName.innerHTML=""
+    }
+    else if(!f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      errorLastName.innerHTML="le nom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
+      valueLastname=null
+    }
+  })
+    address.addEventListener("input",(g)=>{
+      if(g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
+        valueAddress= g.target.value
+        errorAdress.innerHTML=""
+      }
+      else if(!g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
+        errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
+        valueLastname=null
+      }
+  })
+  city.addEventListener("input",(h)=>{
+    if(h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      valueCity= h.target.value
+      errorCity.innerHTML=""
+    }
+    else if(!h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+      errorCity.innerHTML="la ville ne doit pas contenir de nombre/caractère inexistant ?@+ et doit contenir plus d'un caractère"
+      valueCity=null
+    }
+  })
+  email.addEventListener("input",(i)=>{
+    if(i.target.value.match(/^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i)){
+      valueEmail= i.target.value
+      errorEmail.innerHTML=""
+    }
+    if(i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
+      valueEmail= i.target.value
+      console.log(valueEmail)
+      errorEmail.innerHTML=""
+    }
+    //doit contenir @ et .pays
+    else if (!i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
+      errorEmail.innerHTML="l'adresse email n'existe pas ex: kanap@hotmail.fr"
+      valueEmail=null
+    }
+  })
+ 
+}
+regexForm()
+
+
+// envoie formulaire dans local storage
+  async function form(){
+    let btnForm = document.querySelector("#order")
+    btnForm.addEventListener("click",()=>{
+      let form = JSON.parse(localStorage.getItem("formClient"));
+   if(valueFirstname!=null && valueLastname!= null && valueAddress!=null && valueCity!=null && valueEmail!=null ){
+    //permet de decrire les valeurs
+     let formClient={ 
+  firstname: valueFirstname, 
+  lastname: valueLastname,
+  address: valueAddress,
+  city: valueCity,
+  email: valueEmail
+}
+    form=[]
+    form.push(formClient)
+    localStorage.setItem("formClient",JSON.stringify(form)); 
+   }
+    })
+  }
+  form()

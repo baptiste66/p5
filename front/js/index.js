@@ -12,6 +12,7 @@
     document.querySelector(".titles").innerHTML = "<h1>erreur 404</h1>";
 });}
 data();
+
 //function pour afficher chaque produits
 //-------------------------------------
 function useData(index) {
