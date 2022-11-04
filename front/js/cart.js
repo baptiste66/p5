@@ -169,7 +169,7 @@ editQuantity()
 // regex du formulaire
 
   //variable position
-  formBasket=[]
+  
   let firstname=document.querySelector("#firstName")
   let lastname=document.querySelector("#lastName")
   let address=document.querySelector("#address")
@@ -181,44 +181,51 @@ editQuantity()
   let errorAdress = document.querySelector("#addressErrorMsg")
   let errorCity = document.querySelector("#cityErrorMsg")
   let errorEmail= document.querySelector("#emailErrorMsg")
-  let valueFirstname, valueLastname, valueAddress, valueCity, valueEmail
+  let valueAddress, valueCity, valueEmail, valueFirstName, valueLastName
+  
   //condition du fomulaire
-  async function regexForm(){
+
   firstname.addEventListener("input",(e)=>{
     if(e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
-      valueFirstname= e.target.value
+      valueFirstName= e.target.value
       errorFirstName.innerHTML=""
+      form()
+     
     }
     else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
-      valueFirstname=null
+      valueFirstName=null
     }
   })
-
   lastname.addEventListener("input",(f)=>{
     if(f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
-      valueLastname= f.target.value
+      valueLastName= f.target.value
       errorLastName.innerHTML=""
+      form()
+
     }
     else if(!f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorLastName.innerHTML="le nom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
-      valueLastname=null
+      valueLastName=null
     }
   })
     address.addEventListener("input",(g)=>{
       if(g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         valueAddress= g.target.value
         errorAdress.innerHTML=""
+        form()
       }
       else if(!g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
-        valueLastname=null
+        valueAddress=null
       }
   })
   city.addEventListener("input",(h)=>{
     if(h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       valueCity= h.target.value
       errorCity.innerHTML=""
+      form()
+      
     }
     else if(!h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorCity.innerHTML="la ville ne doit pas contenir de nombre/caractère inexistant ?@+ et doit contenir plus d'un caractère"
@@ -229,11 +236,12 @@ editQuantity()
     if(i.target.value.match(/^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i)){
       valueEmail= i.target.value
       errorEmail.innerHTML=""
+    
     }
     if(i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
       valueEmail= i.target.value
-      console.log(valueEmail)
       errorEmail.innerHTML=""
+      form()
     }
     //doit contenir @ et .pays
     else if (!i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
@@ -241,29 +249,60 @@ editQuantity()
       valueEmail=null
     }
   })
+
+// envoie id des produit dans tableau
+let basketId=[]
+function basketid(){
+  let basket =JSON.parse(localStorage.getItem("product"))
+  for (i=0;i<basket.length;i++) {
+    basketId.push(basket[i].id);
+    
+  }
+}
+basketid()
+
  
+ products=basketId
+ function form(){
+  let contact={
+  firstName: document.querySelector("#firstName").value,
+    lastName: document.querySelector("#lastName").value,
+    address: document.querySelector("#address").value,
+    city: document.querySelector("#city").value,
+    email:document.querySelector("#email").value, 
+ }
+ localStorage.setItem("contact",JSON.stringify(contact))
 }
-regexForm()
-
-
-// envoie formulaire dans local storage
-  async function form(){
-    let btnForm = document.querySelector("#order")
-    btnForm.addEventListener("click",()=>{
-      let form = JSON.parse(localStorage.getItem("formClient"));
-   if(valueFirstname!=null && valueLastname!= null && valueAddress!=null && valueCity!=null && valueEmail!=null ){
-    //permet de decrire les valeurs
-     let formClient={ 
-  firstname: valueFirstname, 
-  lastname: valueLastname,
-  address: valueAddress,
-  city: valueCity,
-  email: valueEmail
+let contact={
+  firstName: document.querySelector("#firstName").value,
+    lastName: document.querySelector("#lastName").value,
+    address: document.querySelector("#address").value,
+    city: document.querySelector("#city").value,
+    email:document.querySelector("#email").value, 
+ }
+  // page confirmation
+  async function confirm(){
+    let btnForm = document.querySelector("#order")  
+    let contact =JSON.parse(localStorage.getItem("contact"))
+    let formBasket={
+      contact,
+      products
+    }
+    btnForm.addEventListener("click",(e)=>{
+   if(valueAddress!=null&& valueCity!=null && valueEmail!=null  && valueFirstName!=null && valueLastName!=null){
+   e.preventDefault()
+   fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formBasket),
+    
+  })
 }
-    form=[]
-    form.push(formClient)
-    localStorage.setItem("formClient",JSON.stringify(form)); 
-   }
+   else{
+
+  }
     })
   }
-  form()
+  confirm()
