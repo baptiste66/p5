@@ -181,6 +181,7 @@ editQuantity()
   let errorAdress = document.querySelector("#addressErrorMsg")
   let errorCity = document.querySelector("#cityErrorMsg")
   let errorEmail= document.querySelector("#emailErrorMsg")
+  //variable valeur
   let valueAddress, valueCity, valueEmail, valueFirstName, valueLastName
   
   //condition du fomulaire
@@ -189,9 +190,11 @@ editQuantity()
     if(e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       valueFirstName= e.target.value
       errorFirstName.innerHTML=""
+      //fonction actualise le formulaire en tant réel
       form()
      
     }
+    //pas de nombre ou caractère spéciaux
     else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueFirstName=null
@@ -250,19 +253,8 @@ editQuantity()
     }
   })
 
-// envoie id des produit dans tableau
-let basketId=[]
-function basketid(){
-  let basket =JSON.parse(localStorage.getItem("product"))
-  for (i=0;i<basket.length;i++) {
-    basketId.push(basket[i].id);
-    
-  }
-}
-basketid()
-
- 
- products=basketId
+  //--------------------------------------------------------------
+ // envoie donnée du formulaire dans localstorage
  function form(){
   let contact={
   firstName: document.querySelector("#firstName").value,
@@ -272,7 +264,28 @@ basketid()
     email:document.querySelector("#email").value, 
  }
  localStorage.setItem("contact",JSON.stringify(contact))
+ 
 }
+
+
+//--------------------------------------------------------------
+// envoie id des produit dans tableaux
+let basketId=[]
+function basketid(){
+  let basket =JSON.parse(localStorage.getItem("product"))
+  for (i=0;i<basket.length;i++) {
+    basketId.push(basket[i].id);
+  }
+}
+basketid()
+// on récupère products
+ products=basketId
+
+
+//--------------------------------------------------------------
+// envoie des donnée aux back end pour récupérer info du produit
+
+//variable contact
 let contact={
   firstName: document.querySelector("#firstName").value,
     lastName: document.querySelector("#lastName").value,
@@ -280,16 +293,19 @@ let contact={
     city: document.querySelector("#city").value,
     email:document.querySelector("#email").value, 
  }
-  // page confirmation
+  //function d'envoie qui dirige a la page confimation
   async function confirm(){
     let btnForm = document.querySelector("#order")  
     let contact =JSON.parse(localStorage.getItem("contact"))
+    // info formulaire + id
     let formBasket={
       contact,
       products
     }
+    
     btnForm.addEventListener("click",(e)=>{
    if(valueAddress!=null&& valueCity!=null && valueEmail!=null  && valueFirstName!=null && valueLastName!=null){
+   //envoie des donner au serveur pour récupérer id de commande et information du produit
    e.preventDefault()
    fetch("http://localhost:3000/api/products/order", {
     method: "POST",
@@ -297,12 +313,26 @@ let contact={
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formBasket),
-    
-  })
-}
-   else{
 
+  })
+  //récupération de l'order id
+  .then((res) => res.json())
+  .then((data) => {
+    //traitement des donnée et envoie vers la page confirmation avec un id 
+    window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+    console.log(data.orderId)
+    localStorage.setItem("orderId",JSON.stringify(data.orderId))
+  }).catch(function (err) {
+    console.log(err);
+    alert("erreur");
+  })
+  
+}
+//si null alors message d'erreur 
+   else{
+alert("veuiller remplir le formulaire")
   }
     })
   }
   confirm()
+console.log(products)
