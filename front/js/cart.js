@@ -192,7 +192,6 @@ editQuantity()
       errorFirstName.innerHTML=""
       //fonction actualise le formulaire en tant réel
       form()
-     
     }
     //pas de nombre ou caractère spéciaux
     else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
@@ -220,7 +219,7 @@ editQuantity()
       }
       else if(!g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
-        valueAddress=null
+       valueAddress=null 
       }
   })
   city.addEventListener("input",(h)=>{
@@ -228,7 +227,6 @@ editQuantity()
       valueCity= h.target.value
       errorCity.innerHTML=""
       form()
-      
     }
     else if(!h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorCity.innerHTML="la ville ne doit pas contenir de nombre/caractère inexistant ?@+ et doit contenir plus d'un caractère"
@@ -257,16 +255,15 @@ editQuantity()
  // envoie donnée du formulaire dans localstorage
  function form(){
   let contact={
-  firstName: document.querySelector("#firstName").value,
-    lastName: document.querySelector("#lastName").value,
-    address: document.querySelector("#address").value,
-    city: document.querySelector("#city").value,
-    email:document.querySelector("#email").value, 
- }
+    firstName: document.querySelector("#firstName").value,
+      lastName: document.querySelector("#lastName").value,
+      address: document.querySelector("#address").value,
+      city: document.querySelector("#city").value,
+      email:document.querySelector("#email").value, 
+   }
  localStorage.setItem("contact",JSON.stringify(contact))
- 
+ console.log(contact)
 }
-
 
 //--------------------------------------------------------------
 // envoie id des produit dans tableaux
@@ -285,43 +282,47 @@ basketid()
 //--------------------------------------------------------------
 // envoie des donnée aux back end pour récupérer info du produit
 
-//variable contact
-let contact={
-  firstName: document.querySelector("#firstName").value,
-    lastName: document.querySelector("#lastName").value,
-    address: document.querySelector("#address").value,
-    city: document.querySelector("#city").value,
-    email:document.querySelector("#email").value, 
- }
+
+
   //function d'envoie qui dirige a la page confimation
-  async function confirm(){
+   function confirm(){
     let btnForm = document.querySelector("#order")  
-    let contact =JSON.parse(localStorage.getItem("contact"))
     // info formulaire + id
-    let formBasket={
-      contact,
-      products
-    }
-    
+    let foundContact= basket.find(contact=>contact.firstName!=null && contact.lastName!=null &&
+      contact.address!=null && contact.city!=null && contact.email!=null)
     btnForm.addEventListener("click",(e)=>{
-   if(valueAddress!=null&& valueCity!=null && valueEmail!=null  && valueFirstName!=null && valueLastName!=null){
+      
+    let order =JSON.parse(localStorage.getItem("contact"))
+let contact={
+  firstName:order.firstName,
+      lastName:order.lastName,
+      address:order.address,
+      city:order.city,
+      email:order.email,
+}
+let formBasket={
+  contact,
+  products
+}
+      form()
+      //si les valuers contact ne sont pas nul alors envoyer les donner aux serveur 
+   if(foundContact==undefined){
+   e.preventDefault() 
    //envoie des donner au serveur pour récupérer id de commande et information du produit
-   e.preventDefault()
    fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formBasket),
-
   })
   //récupération de l'order id
   .then((res) => res.json())
   .then((data) => {
-    //traitement des donnée et envoie vers la page confirmation avec un id 
+    // numéro de commande dans le local storage 
+    localStorage.setItem("orderId", data.orderId)
+    //traitement des donnée et envoie vers la page confirmation avec numéro de commande dans l'url
     window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
-    console.log(data.orderId)
-    localStorage.setItem("orderId",JSON.stringify(data.orderId))
   }).catch(function (err) {
     console.log(err);
     alert("erreur");
@@ -335,4 +336,5 @@ alert("veuiller remplir le formulaire")
     })
   }
   confirm()
-console.log(products)
+  
+

@@ -114,7 +114,7 @@ infoBasket()
 //----------------------------------------------
 //local storage 
 
-//si panier vide injecte un premier produit
+// fonction si panier vide injecte un premier produit
 function addProductBasket(){
   let basket = JSON.parse(localStorage.getItem("product"));
 //si panier vide ajoute article dans le panier
@@ -164,6 +164,7 @@ function classementProduct(){
     return 0;
   })
     localStorage.setItem ("product",JSON.stringify(basket));
+    
 }
 
 
