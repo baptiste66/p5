@@ -2,9 +2,8 @@
 let basket =JSON.parse(localStorage.getItem("product"))
 console.table(basket)
 
-
-//----------------------------------------------------------
 // fonction affichage des produits dans le panier
+//----------------------------------------------------------
 async function basketDisplay(){ 
   let basket =JSON.parse(localStorage.getItem("product"))
 if(basket!=null){
@@ -50,9 +49,8 @@ if (basket===null){
 }
 basketDisplay();
 
-
-//----------------------------------------
 //bouton supprimer
+//----------------------------------------
 async function delete_btn (basketDisplay) {
   await basketDisplay;
   // 2 variable en une pour récupérer id et couleur du produit
@@ -94,9 +92,8 @@ async function delete_btn (basketDisplay) {
 };
 delete_btn()
 
-
-//--------------------------------------------------------------
 // fonction ajout coût total
+//--------------------------------------------------------------
 function totalPrice() {
   //tableaux pour y intégrer les prix + calcul(totalpricetabl)
 let totalPriceTabl=[];
@@ -118,9 +115,8 @@ totalPrice= totalPriceTabl.reduce(reducer,0)
 }
  totalPrice();
 
-
-//--------------------------------------------------------------
 // fonction nombre d'article total
+//--------------------------------------------------------------
 function totalQuantityProduct(){
 let totalQuantity=[];
 
@@ -137,12 +133,9 @@ let reducer=( accumulator , currentValue) => accumulator+currentValue
 totalQuantityProduct();
 
 
-
-//--------------------------------------------------------------
 // fonction changer quantité dans le panier 
-async function editQuantity (basketDisplay) {
-  await basketDisplay;
- 
+//--------------------------------------------------------------
+async function editQuantity () {
   let most_btn = document.querySelectorAll(".cart__item")
   //explication foreach
   most_btn.forEach((quant)=>{
@@ -168,8 +161,7 @@ editQuantity()
 //--------------------------------------------------------------
 // regex du formulaire
 
-  //variable position
-  
+  //variable formulaire
   let firstname=document.querySelector("#firstName")
   let lastname=document.querySelector("#lastName")
   let address=document.querySelector("#address")
@@ -185,20 +177,22 @@ editQuantity()
   let valueAddress, valueCity, valueEmail, valueFirstName, valueLastName
   
   //condition du fomulaire
-
   firstname.addEventListener("input",(e)=>{
+    //autorise - et ^à 
     if(e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       valueFirstName= e.target.value
       errorFirstName.innerHTML=""
       //fonction actualise le formulaire en tant réel
       form()
     }
-    //pas de nombre ou caractère spéciaux
+    //pas de nombre ou caractère spéciaux et limite de 1 à 31
     else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueFirstName=null
     }
   })
+
+
   lastname.addEventListener("input",(f)=>{
     if(f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       valueLastName= f.target.value
@@ -211,7 +205,10 @@ editQuantity()
       valueLastName=null
     }
   })
+
+
     address.addEventListener("input",(g)=>{
+      //autorise les nombre
       if(g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         valueAddress= g.target.value
         errorAdress.innerHTML=""
@@ -222,6 +219,8 @@ editQuantity()
        valueAddress=null 
       }
   })
+
+
   city.addEventListener("input",(h)=>{
     if(h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       valueCity= h.target.value
@@ -233,7 +232,10 @@ editQuantity()
       valueCity=null
     }
   })
+
+
   email.addEventListener("input",(i)=>{
+    //autorise caractère spéciaux
     if(i.target.value.match(/^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i)){
       valueEmail= i.target.value
       errorEmail.innerHTML=""
@@ -278,12 +280,8 @@ basketid()
 // on récupère products
  products=basketId
 
-
-//--------------------------------------------------------------
 // envoie des donnée aux back end pour récupérer info du produit
-
-
-
+//--------------------------------------------------------------
   //function d'envoie qui dirige a la page confimation
    function confirm(){
     let btnForm = document.querySelector("#order")  
@@ -327,7 +325,6 @@ let formBasket={
     console.log(err);
     alert("erreur");
   })
-  
 }
 //si null alors message d'erreur 
    else{

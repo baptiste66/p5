@@ -20,6 +20,8 @@ async function data () {
       document.querySelector(".item").innerHTML = "<h1>erreur 404</h1>";
   });}
 data()
+
+
 //affichage du produit
 //---------------------------------------------------
 //déclaration tableaux vide modifier par la fonctions suivantes
@@ -27,8 +29,8 @@ data()
 //ouverture du tableaux pour le panier
 let productBasket ={};
 productBasket.id=id
-//fonction pour affichage du produit
 
+//fonction pour affichage du produit
 async function productDisplay () {
 //déclaration des constantes pour  implanter les éléments 
 const imageAlt = document.querySelector(".item__img");
@@ -38,7 +40,6 @@ const description = document.getElementById("description");
 const colors = document.getElementById("colors");
 // récupération du tableau de donner de la fonction data 
   await data();
-  //affichage des produits
   imageAlt.innerHTML=`<img src="${useData.imageUrl}" alt="${useData.altTxt}">`;
   title.textContent = `${useData.name}`;
   price.textContent = `${useData.price}`;
@@ -53,7 +54,6 @@ productDisplay();
 
 //choix couleur et quantité 
 //----------------------------------------------------
-
 let addColor = document.querySelector("#colors");
 let productColor;
   addColor.addEventListener("input", (c) => {
@@ -99,9 +99,9 @@ addProduct.addEventListener("click", () => {
   }})
 
 
-
-  //----------------------------------------------
 //donner du panier 
+  //----------------------------------------------
+
 async function infoBasket(){
   await data()
   //récupération du prix dans le panier
@@ -111,9 +111,9 @@ async function infoBasket(){
   productBasket.price=`${useData.price}`
 }
 infoBasket()
-//----------------------------------------------
-//local storage 
 
+//local storage
+//----------------------------------------------
 // fonction si panier vide injecte un premier produit
 function addProductBasket(){
   let basket = JSON.parse(localStorage.getItem("product"));
@@ -150,9 +150,6 @@ if (basket!=null){
       }
   }
 }
-
-addOtherProduct
-
 //si produit pas vide at aucun id identique pousse le produit dans un nuveaux objet
 function classementProduct(){
   let basket = JSON.parse(localStorage.getItem("product"));
