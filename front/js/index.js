@@ -9,7 +9,7 @@
   })
   //message d'erreur
   .catch((err) => {
-    document.querySelector(".titles").innerHTML = "<h1>erreur 404</h1>";
+    document.querySelector(".titles").innerHTML = "<h2>erreur 404</h2>";
 });}
 data();
 

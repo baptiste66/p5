@@ -44,7 +44,7 @@ if(basket!=null){
 }
 //si produit vide message error
 if (basket===null){
-  document.querySelector(".cart").innerHTML = "<h1>Votre panier est vide :(</h1>";
+  document.querySelector(".cart").innerHTML = "<h2>Votre panier est vide :(</h2>";
 }
 }
 basketDisplay();
@@ -135,7 +135,7 @@ totalQuantityProduct();
 
 // fonction changer quantité dans le panier 
 //--------------------------------------------------------------
-async function editQuantity () {
+function editQuantity () {
   let most_btn = document.querySelectorAll(".cart__item")
   //explication foreach
   most_btn.forEach((quant)=>{
@@ -143,7 +143,7 @@ async function editQuantity () {
     quant.addEventListener("change",(eq)=>{
 for(i=0;i<basket.length; i++){
   //si id et couleur du basket identique 
-if(basket[i].id === quant.dataset.id &&quant.dataset.color === basket[i].color){
+if(basket[i].id === quant.dataset.id &&quant.dataset.color === basket[i].color && eq.target.value>=1 && eq.target.value<=100){
    // quantité basket identique au changement effectuer dans le panier
     basket[i].quantity= eq.target.value,
     localStorage.setItem("product",JSON.stringify(basket)),
@@ -291,6 +291,7 @@ basketid()
     btnForm.addEventListener("click",(e)=>{
       
     let order =JSON.parse(localStorage.getItem("contact"))
+
 let contact={
   firstName:order.firstName,
       lastName:order.lastName,
@@ -298,6 +299,7 @@ let contact={
       city:order.city,
       email:order.email,
 }
+
 let formBasket={
   contact,
   products

@@ -2,7 +2,6 @@
 //-----------------------------------------------------------
 //récupération de l'url + supression de ?_id=
 let id= window.location.search.split("?_id=").join("");
-
 //demande id
 console.log(id);
 
@@ -17,7 +16,7 @@ async function data () {
     })
     //message d'erreur
     .catch((err) => {
-      document.querySelector(".item").innerHTML = "<h1>erreur 404</h1>";
+      document.querySelector(".item").innerHTML = "<h2>erreur 404</h2>";
   });}
 data()
 
@@ -39,7 +38,7 @@ const price = document.getElementById("price");
 const description = document.getElementById("description");
 const colors = document.getElementById("colors");
 // récupération du tableau de donner de la fonction data 
-  await data();
+ await data();
   imageAlt.innerHTML=`<img src="${useData.imageUrl}" alt="${useData.altTxt}">`;
   title.textContent = `${useData.name}`;
   price.textContent = `${useData.price}`;
@@ -84,8 +83,9 @@ quantity.addEventListener("input", (q) => {
 let addProduct= document.getElementById("addToCart");
 // condition pour ajouter au panier
 addProduct.addEventListener("click", () => {
+  productQuantity =q.data;
   //message d'erreur si <1ou>100 /pas de couleur 
-  if (productQuantity < 1 || productQuantity > 100 ||productQuantity === undefined ||
+  if (productQuantity<1 || productQuantity > 100 ||productQuantity === undefined ||
      productColor === undefined||productColor== ""|| productColor==null){
     alert("veuiller saisir une quantité entre 1 et 100 et/ou une couleur")
   }
@@ -103,7 +103,7 @@ addProduct.addEventListener("click", () => {
   //----------------------------------------------
 
 async function infoBasket(){
-  await data()
+await data()
   //récupération du prix dans le panier
   productBasket.alt=`${useData.altTxt}`
   productBasket.image=`${useData.imageUrl} `
@@ -160,7 +160,7 @@ function classementProduct(){
     if (a.id > b.id) return 1;
     return 0;
   })
-    localStorage.setItem ("product",JSON.stringify(basket));
+    localStorage.setItem("product",JSON.stringify(basket));
     
 }
 
