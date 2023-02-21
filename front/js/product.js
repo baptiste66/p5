@@ -67,8 +67,11 @@ let productColor;
 
 let quantity = document.getElementById("quantity");
 let productQuantity;
+//remet la valeur 0 quand ont actualise lapage empêche le bug de la quantiter deja selectionner 
+quantity.value = 0
 quantity.addEventListener("input", (q) => {
   productQuantity =q.data;
+  console.log(productQuantity)
   productBasket.quantity=productQuantity
   document.getElementById("addToCart").style.color = "white";
   document.getElementById("addToCart").textContent = "Ajouter au panier";

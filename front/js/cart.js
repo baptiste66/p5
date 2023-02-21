@@ -5,69 +5,81 @@ let basket = JSON.parse(localStorage.getItem("product"))
 //----------------------------------------------------------
 let dataList=[];
 
-async function basketDisplay() {
-  let basket = JSON.parse(localStorage.getItem("product"))
-  let dataList=[];
-  if (basket != null) {
-    let productPosition = document.querySelector("#cart__items")
-    let productDisplay=[];
-    
-    for (let i = 0; i < basket.length; i++) {
+async function data() {
+  let dataList = [];
+  for (let i = 0; i < basket.length; i++) {
+    try {
       let useData = await fetch(`http://localhost:3000/api/products/${basket[i].id}`)
-        .then((res) => res.json())
-        .catch((err) => {
-          console.log(`Erreur lors de la récupération des données pour le produit ${basket[i].id}: ${err}`)
-          return null
-        })
-
-      if (useData !== null) {
-        let productData={
-         name:`${useData.name}`,
-          img:`${useData.imageUrl}`,
-          dalt:`${useData.alt}`,
-          price:`${useData.price}`
-        }
-        dataList.push(productData)
-
-        productDisplay += 
-          // copie de cart.html
-          `<article class="cart__item" data-id="${basket[i].id}" data-color="${basket[i].color}">
-            <div class="cart__item__img">
-              <img src="${useData.imageUrl}" alt="${useData.alt}">
-            </div>
-            <div class="cart__item__content">
-              <div class="cart__item__content__description">
-                <h2>Nom : ${useData.name}</h2>
-                <p>Couleur : ${basket[i].color}</p>
-                <p>Prix : ${useData.price}€</p>
-              </div>
-              <div class="cart__item__content__settings">
-                <div class="cart__item__content__settings__quantity">
-                  <p>Qté :</p>
-                  <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket[i].quantity}">
-                </div>
-                <div class="cart__item__content__settings__delete">
-                  <p class="deleteItem" data-id="${basket[i].id}" data-color="${basket[i].color}">Supprimer</p>
-                </div>
-              </div>
-            </div>
-          </article>`
-      }
+        .then((res) => res.json());
+      let productData = {
+        name: `${useData.name}`,
+        img: `${useData.imageUrl}`,
+        alt: `${useData.altTxt}`,
+        price: `${useData.price}`,
+      };
+      dataList.push(productData);
+    } catch (err) {
+      console.log(`Erreur lors de la récupération des données pour le produit ${basket[i].id}: ${err}`);
+      return null;
     }
-    productPosition.innerHTML = productDisplay
   }
-  // si le panier est vide, afficher un message d'erreur
-  if (basket === null || basket.length === 0) {
-    document.querySelector(".cart").innerHTML = "<h2>Votre panier est vide :(</h2>";
-  }console.table(dataList)
-delete_btn()
-totalPrice()
-editQuantity()
-totalQuantityProduct()
-  return;
+  return dataList;
 }
 
-basketDisplay()
+
+async function basketDisplay(){ 
+  let basket =JSON.parse(localStorage.getItem("product"))
+  
+if(basket!=null){
+  let dataList=await data()
+  let productPosition=document.querySelector("#cart__items")
+  productDisplay=[]
+  // tant que i n'as pas le même nombre que le nombre de produit dans le panier continuer la boucle
+  for (i=0;i<basket.length;i++) {
+    
+      productDisplay = 
+      //reprise des produits de l'ancienne boucle + nouvelle boucle
+      productDisplay +
+      // copie de cart.html
+      `<article class="cart__item" data-id="${basket[i].id}" data-color="${basket[i].color}">
+      <div class="cart__item__img">
+        <img src="${dataList[i].img}" alt="${dataList[i].alt}">
+      </div>
+      <div class="cart__item__content">
+        <div class="cart__item__content__description">
+          <h2>Nom : ${dataList[i].name}</h2>
+          <p>Couleur : ${basket[i].color}</p>
+          <p>Prix : ${dataList[i].price}€</p>
+        </div>
+        <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté :</p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket[i].quantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                      <p class="deleteItem"data-id="${basket[i].id}" data-color="${basket[i].color}">Supprimer</p>
+                    </div>
+                  </div>
+                </div>
+              </article>`
+    }
+    // quand la boucle est finis affichage des produit
+  if(i==basket.length){
+      productPosition.innerHTML=productDisplay
+    }
+}
+//si produit vide message error
+if(basket===null || basket==undefined){
+  document.querySelector(".cart").innerHTML = "<h2>Votre panier est vide :(</h2>";
+}
+delete_btn()
+totalPrice()
+totalQuantityProduct()
+editQuantity()
+}
+basketDisplay();
+
+
 
 //bouton supprimer
 //----------------------------------------
@@ -111,11 +123,11 @@ async function totalPrice() {
   //tableaux pour y intégrer les prix + calcul(totalpricetabl)
 let totalPriceTabl=[];
 let totalPrice=[];
-
+let dataList=await data()
 //boucle calcul le prix*quantité de chaque produit
 for(i=0;i<basket.length;i++){
   //cherche le prix dans basket
-  productPrice=dataList.price
+  productPrice=dataList[i].price
   productQuantity=basket[i].quantity
   //calcul du prix total de chaque produit
   totalPriceMath= productPrice*productQuantity
@@ -172,9 +184,16 @@ if(basket[i].id === quant.dataset.id &&quant.dataset.color === basket[i].color &
 editQuantity()
 
 
+
+
+
+
 //--------------------------------------------------------------
 // regex du formulaire
 
+
+  //variable formulaire
+  
   //variable formulaire
   let firstname=document.querySelector("#firstName")
   let lastname=document.querySelector("#lastName")
@@ -203,6 +222,7 @@ editQuantity()
     else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueFirstName=null
+      form()
     }
   })
 
@@ -217,6 +237,7 @@ editQuantity()
     else if(!f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorLastName.innerHTML="le nom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueLastName=null
+      form()
     }
   })
 
@@ -226,11 +247,12 @@ editQuantity()
       if(g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         valueAddress= g.target.value
         errorAdress.innerHTML=""
-        form()
+       form
       }
       else if(!g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
        valueAddress=null 
+       form()
       }
   })
 
@@ -244,108 +266,136 @@ editQuantity()
     else if(!h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
       errorCity.innerHTML="la ville ne doit pas contenir de nombre/caractère inexistant ?@+ et doit contenir plus d'un caractère"
       valueCity=null
+      form()
     }
   })
 
 
   email.addEventListener("input",(i)=>{
     //autorise caractère spéciaux
-    if(i.target.value.match(/^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i)){
-      valueEmail= i.target.value
-      errorEmail.innerHTML=""
-    
-    }
-    if(i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
+    if(i.target.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i)){
       valueEmail= i.target.value
       errorEmail.innerHTML=""
       form()
     }
     //doit contenir @ et .pays
-    else if (!i.target.value.match(/^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i)){
+    else if (!i.target.value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i)){
       errorEmail.innerHTML="l'adresse email n'existe pas ex: kanap@hotmail.fr"
       valueEmail=null
+      form()
     }
   })
+//--------------------------------------------------------------
+// envoie donnée du formulaire dans localstorage
 
-  //--------------------------------------------------------------
- // envoie donnée du formulaire dans localstorage
- function form(){
-  let contact={
-    firstName: document.querySelector("#firstName").value,
-      lastName: document.querySelector("#lastName").value,
-      address: document.querySelector("#address").value,
-      city: document.querySelector("#city").value,
-      email:document.querySelector("#email").value, 
-   }
- localStorage.setItem("contact",JSON.stringify(contact))
- console.log(contact)
+// envoie donnée du formulaire dans localstorage
+function form() {
+  let contact = {
+    firstName: null,
+    lastName: null,
+    address: null,
+    city: null,
+    email: null
+  };
+  //si respecte regex apparais pas comme null
+  if (valueFirstName !== null) {
+    contact.firstName = document.querySelector("#firstName").value;
+  }
+  if (valueLastName !== null) {
+    contact.lastName = document.querySelector("#lastName").value;
+  }
+  if (valueAddress !== null) {
+    contact.address = document.querySelector("#address").value;
+  }
+  if (valueCity !== null) {
+    contact.city = document.querySelector("#city").value;
+  }
+  if (valueEmail !== null) {
+    contact.email = document.querySelector("#email").value;
+  }
+  localStorage.setItem("contact", JSON.stringify(contact));
+  console.log(contact);
 }
+
+// Appeler form() pour enregistrer les données initiales dans le localStorage
+form();
+
+
 
 //--------------------------------------------------------------
 // envoie id des produit dans tableaux
 let basketId=[]
 function basketid(){
-  let basket =JSON.parse(localStorage.getItem("product"))
-  for (i=0;i<basket.length;i++) {
-    basketId.push(basket[i].id);
-  }
+let basket =JSON.parse(localStorage.getItem("product"))
+for (i=0;i<basket.length;i++) {
+  basketId.push(basket[i].id);
+}
 }
 basketid()
 // on récupère products
- products=basketId
+products=basketId
 
-// envoie des donnée aux back end pour récupérer info du produit
+
 //--------------------------------------------------------------
-  //function d'envoie qui dirige a la page confimation
-   function confirm(){
-    let btnForm = document.querySelector("#order")  
-    // info formulaire + id
-    let foundContact= basket.find(contact=>contact.firstName!=null && contact.lastName!=null &&
-      contact.address!=null && contact.city!=null && contact.email!=null)
-    btnForm.addEventListener("click",(e)=>{
-      
-    let order =JSON.parse(localStorage.getItem("contact"))
+// envoie des donnée aux back end pour récupérer info du produit
+
+
+
+//function d'envoie qui dirige a la page confimation
+ async function confirmForm(){
+  let btnForm = document.querySelector("#order")  
+  // info formulaire + id
+  let foundContact= basket.find(contact=>contact.firstName!=null && contact.lastName!=null &&
+    contact.address!=null && contact.city!=null && contact.email!=null)
+await form();
+  btnForm.addEventListener("click",(e)=>{
+
+    
+
+  let order =JSON.parse(localStorage.getItem("contact"))
 let contact={
-  firstName:order.firstName,
-      lastName:order.lastName,
-      address:order.address,
-      city:order.city,
-      email:order.email,
+    firstName:order.firstName,
+    lastName:order.lastName,
+    address:order.address,
+    city:order.city,
+    email:order.email,
 }
 let formBasket={
-  contact,
-  products
+contact,
+products
 }
-      form()
-      //si les valuers contact ne sont pas nul alors envoyer les donner aux serveur 
-   if(foundContact==undefined){
-   e.preventDefault() 
-   //envoie des donner au serveur pour récupérer id de commande et information du produit
-   fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(formBasket),
-  })
-  //récupération de l'order id
-  .then((res) => res.json())
-  .then((data) => {
-    // numéro de commande dans le local storage 
-    localStorage.setItem("orderId", data.orderId)
-    //traitement des donnée et envoie vers la page confirmation avec numéro de commande dans l'url
-    window.location.href = `confirmation.html?commande=${data.orderId}`;
-  }).catch(function (err) {
-    console.log(err);
-    alert("erreur");
-  })
+
+    
+    //si les valuers contact ne sont pas nul alors envoyer les donner aux serveur 
+ if(foundContact==undefined){
+ e.preventDefault() 
+ //envoie des donner au serveur pour récupérer id de commande et information du produit
+ fetch("http://localhost:3000/api/products/order", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(formBasket),
+})
+//récupération de l'order id
+.then((res) => res.json())
+.then((data) => {
+  // numéro de commande dans le local storage 
+  localStorage.setItem("orderId", data.orderId)
+  //traitement des donnée et envoie vers la page confirmation avec numéro de commande dans l'url
+  window.location.href = `confirmation.html?commande=${data.orderId}`;
+}).catch(function (err) {
+  console.log(err);
+  alert("erreur");
+})
+
 }
 //si null alors message d'erreur 
-   else{
+ else{
+  e.preventDefault()
 alert("veuiller remplir le formulaire")
-  }
-    })
-   }
-  confirm()
-  
-  
+
+}
+  })
+}
+confirmForm()

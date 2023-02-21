@@ -1,10 +1,6 @@
 //------------------------------------------------------------
 // fonction affichage numéro de commande et delete donner
-
-main();
-function main() {
   displayOrderIdAndPrice();
-}
 
 function displayOrderIdAndPrice() {
 //récupération de l'id
