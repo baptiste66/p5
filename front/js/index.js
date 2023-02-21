@@ -15,20 +15,19 @@ data();
 
 //function pour afficher chaque produits
 //-------------------------------------
-function useData(index) {
+function useData(productData) {
   
 // déclaration de l'endroit ou implanter les produits
 let card = document.querySelector("#items");
 // boucle pour chaque produits
-for(let product of index)
+for(let product of productData)
   // modification pour que id soit afficher dans l'url de la page produit
-   card.innerHTML += `<a href="./product.html?_id=${product._id}">
+   card.innerHTML += `<a href="./product.html?id=${product._id}">
    <article>
       <img src="${product.imageUrl}" alt="${product.altTxt}">
       <h3 class="productName">${product.name}</h3>
       <p class="productDescription">${product.description}</p>
     </article>
   </a>`
-
 }
 

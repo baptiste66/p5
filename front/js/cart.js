@@ -1,107 +1,121 @@
-// récupération donnée du localstorage 
-let basket =JSON.parse(localStorage.getItem("product"))
-console.table(basket)
+//récupération local storage
+let basket = JSON.parse(localStorage.getItem("product"))
 
 // fonction affichage des produits dans le panier
 //----------------------------------------------------------
-async function basketDisplay(){ 
-  let basket =JSON.parse(localStorage.getItem("product"))
-if(basket!=null){
-  let productPosition=document.querySelector("#cart__items")
-  productDisplay=[]
-  // tant que i n'as pas le même nombre que le nombre de produit dans le panier continuer la boucle
-  for (i=0;i<basket.length;i++) {
-      productDisplay = 
-      //reprise des produits de l'ancienne boucle + nouvelle boucle
-      productDisplay +
-      // copie de cart.html
-      `<article class="cart__item" data-id="${basket[i].id}" data-color="${basket[i].color}">
-      <div class="cart__item__img">
-        <img src="${basket[i].image}" alt="${basket[i].alt}">
-      </div>
-      <div class="cart__item__content">
-        <div class="cart__item__content__description">
-          <h2>Nom : ${basket[i].name}</h2>
-          <p>Couleur : ${basket[i].color}</p>
-          <p>Prix : ${basket[i].price}€</p>
-        </div>
-        <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                      <p>Qté :</p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket[i].quantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem"data-id="${basket[i].id}" data-color="${basket[i].color}">Supprimer</p>
-                    </div>
-                  </div>
+let dataList=[];
+
+async function basketDisplay() {
+  let basket = JSON.parse(localStorage.getItem("product"))
+  let dataList=[];
+  if (basket != null) {
+    let productPosition = document.querySelector("#cart__items")
+    let productDisplay=[];
+    
+    for (let i = 0; i < basket.length; i++) {
+      let useData = await fetch(`http://localhost:3000/api/products/${basket[i].id}`)
+        .then((res) => res.json())
+        .catch((err) => {
+          console.log(`Erreur lors de la récupération des données pour le produit ${basket[i].id}: ${err}`)
+          return null
+        })
+
+      if (useData !== null) {
+        let productData={
+         name:`${useData.name}`,
+          img:`${useData.imageUrl}`,
+          dalt:`${useData.alt}`,
+          price:`${useData.price}`
+        }
+        dataList.push(productData)
+
+        productDisplay += 
+          // copie de cart.html
+          `<article class="cart__item" data-id="${basket[i].id}" data-color="${basket[i].color}">
+            <div class="cart__item__img">
+              <img src="${useData.imageUrl}" alt="${useData.alt}">
+            </div>
+            <div class="cart__item__content">
+              <div class="cart__item__content__description">
+                <h2>Nom : ${useData.name}</h2>
+                <p>Couleur : ${basket[i].color}</p>
+                <p>Prix : ${useData.price}€</p>
+              </div>
+              <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                  <p>Qté :</p>
+                  <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket[i].quantity}">
                 </div>
-              </article>`
+                <div class="cart__item__content__settings__delete">
+                  <p class="deleteItem" data-id="${basket[i].id}" data-color="${basket[i].color}">Supprimer</p>
+                </div>
+              </div>
+            </div>
+          </article>`
+      }
     }
-    // quand la boucle est finis affichage des produit
-  if(i==basket.length){
-      productPosition.innerHTML=productDisplay
-    }
+    productPosition.innerHTML = productDisplay
+  }
+  // si le panier est vide, afficher un message d'erreur
+  if (basket === null || basket.length === 0) {
+    document.querySelector(".cart").innerHTML = "<h2>Votre panier est vide :(</h2>";
+  }console.table(dataList)
+delete_btn()
+totalPrice()
+editQuantity()
+totalQuantityProduct()
+  return;
 }
-//si produit vide message error
-if (basket===null){
-  document.querySelector(".cart").innerHTML = "<h2>Votre panier est vide :(</h2>";
-}
-}
-basketDisplay();
+
+basketDisplay()
 
 //bouton supprimer
 //----------------------------------------
-async function delete_btn (basketDisplay) {
-  await basketDisplay;
-  // 2 variable en une pour récupérer id et couleur du produit
-  let basket =JSON.parse(localStorage.getItem("product"))
- let garbages = document.querySelectorAll(".deleteItem")
- let notDelete=[]
-
-   garbages.forEach((garbage)=>{
+async function delete_btn () {
+  let basket = JSON.parse(localStorage.getItem("product"))
+  let garbages = document.querySelectorAll(".deleteItem")
+  let notDelete=[];
+  garbages.forEach((garbage)=>{
     garbage.addEventListener("click",()=>{
-      console.log(garbage)
-      // nombre de produit
-      let totalremove=basket.length
-      //si un seul article tous supprimer
-      if(totalremove==1){
-       (localStorage.removeItem("product"))
+      // nombre de produits
+      let totalremove = basket.length;
+      // si un seul article, tout supprimer
+      if(totalremove == 1){
+        localStorage.removeItem("product");
         location.href = "cart.html";
       }
-      //si plusieur garder les produit avec id et couleur différent de celui sélectionner
+      // si plusieurs articles, garder les produits avec des ID et des couleurs différents de celui sélectionné
       else{
-        //filtre les élément non sélectionner les isole et supprimme le produit sélectionner
-        notDelete = basket.filter((basket) => {
+        // filtre les éléments non sélectionnés, les isole et supprime le produit sélectionné
+        notDelete = basket.filter((item) => {
           if (
-            garbage.dataset.id != basket.id ||
-            garbage.dataset.color != basket.color
+            garbage.dataset.id != item.id ||
+            garbage.dataset.color != item.color
           ) {
             return true;
           }
         });
-        //enregistre les produit non sélectionner
+        // enregistre les produits non sélectionnés
         localStorage.setItem("product", JSON.stringify(notDelete));
-        //actualise la page avec information
-        totalPrice();
-        totalQuantityProduct()
+        // actualise la page avec les nouvelles informations
         location.href = "cart.html";
       }
     });
   });
-  return;
 };
-delete_btn()
+
 
 // fonction ajout coût total
 //--------------------------------------------------------------
-function totalPrice() {
+async function totalPrice() {
   //tableaux pour y intégrer les prix + calcul(totalpricetabl)
 let totalPriceTabl=[];
 let totalPrice=[];
+
 //boucle calcul le prix*quantité de chaque produit
 for(i=0;i<basket.length;i++){
   //cherche le prix dans basket
-  productPrice=basket[i].price
+  productPrice=dataList.price
   productQuantity=basket[i].quantity
   //calcul du prix total de chaque produit
   totalPriceMath= productPrice*productQuantity
@@ -291,7 +305,6 @@ basketid()
     btnForm.addEventListener("click",(e)=>{
       
     let order =JSON.parse(localStorage.getItem("contact"))
-
 let contact={
   firstName:order.firstName,
       lastName:order.lastName,
@@ -299,7 +312,6 @@ let contact={
       city:order.city,
       email:order.email,
 }
-
 let formBasket={
   contact,
   products
@@ -322,7 +334,7 @@ let formBasket={
     // numéro de commande dans le local storage 
     localStorage.setItem("orderId", data.orderId)
     //traitement des donnée et envoie vers la page confirmation avec numéro de commande dans l'url
-    window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+    window.location.href = `confirmation.html?commande=${data.orderId}`;
   }).catch(function (err) {
     console.log(err);
     alert("erreur");
@@ -333,7 +345,7 @@ let formBasket={
 alert("veuiller remplir le formulaire")
   }
     })
-  }
+   }
   confirm()
   
-
+  

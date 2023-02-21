@@ -1,7 +1,7 @@
 //récupération de l'id 
 //-----------------------------------------------------------
 //récupération de l'url + supression de ?_id=
-let id= window.location.search.split("?_id=").join("");
+let id= window.location.search.split("?id=").join("");
 //demande id
 console.log(id);
 
@@ -83,7 +83,6 @@ quantity.addEventListener("input", (q) => {
 let addProduct= document.getElementById("addToCart");
 // condition pour ajouter au panier
 addProduct.addEventListener("click", () => {
-  productQuantity =q.data;
   //message d'erreur si <1ou>100 /pas de couleur 
   if (productQuantity<1 || productQuantity > 100 ||productQuantity === undefined ||
      productColor === undefined||productColor== ""|| productColor==null){
@@ -97,20 +96,6 @@ addProduct.addEventListener("click", () => {
     addProduct.textContent="produit ajouté"
     alert("Votre produit à bien été enregistré")
   }})
-
-
-//donner du panier 
-  //----------------------------------------------
-
-async function infoBasket(){
-await data()
-  //récupération du prix dans le panier
-  productBasket.alt=`${useData.altTxt}`
-  productBasket.image=`${useData.imageUrl} `
-  productBasket.name=`${useData.name}`;
-  productBasket.price=`${useData.price}`
-}
-infoBasket()
 
 //local storage
 //----------------------------------------------
@@ -132,10 +117,9 @@ if (basket!=null){
 
 //si produit deja existant change quantiter + crée nouveaux produit
   function addOtherProduct(){
+    // variable pour récupérer le product du basket dans localstorage
    let basket = JSON.parse(localStorage.getItem("product"));
     for(let product of basket){
-// variable pour récupérer le product du basket dans localstorage 
-    
      //cherche dans le basket si id et color identique
       let foundProduct= basket.find(product=>product.id==id && product.color==productBasket.color)
        //et si les id et couleur identique alors additionner la quantiter du produit avec le produit deja existant
@@ -150,6 +134,7 @@ if (basket!=null){
       }
   }
 }
+
 //si produit pas vide at aucun id identique pousse le produit dans un nuveaux objet
 function classementProduct(){
   let basket = JSON.parse(localStorage.getItem("product"));
