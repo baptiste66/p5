@@ -123,7 +123,7 @@ async function totalPrice() {
   //tableaux pour y intégrer les prix + calcul(totalpricetabl)
 let totalPriceTabl=[];
 let totalPrice=[];
-let dataList=await data()
+let dataList= await data()
 //boucle calcul le prix*quantité de chaque produit
 for(i=0;i<basket.length;i++){
   //cherche le prix dans basket
@@ -219,8 +219,7 @@ editQuantity()
       form()
     }
     //pas de nombre ou caractère spéciaux et limite de 1 à 31
-    else if(!e.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
-      errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
+    else {errorFirstName.innerHTML="le prénom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueFirstName=null
       form()
     }
@@ -234,8 +233,7 @@ editQuantity()
       form()
 
     }
-    else if(!f.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
-      errorLastName.innerHTML="le nom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
+    else {errorLastName.innerHTML="le nom ne doit pas contenir de nombre et doit contenir plus d'un caractère"
       valueLastName=null
       form()
     }
@@ -247,12 +245,13 @@ editQuantity()
       if(g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
         valueAddress= g.target.value
         errorAdress.innerHTML=""
-       form
+       form ()
       }
-      else if(!g.target.value.match(/^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i)){
-        errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
-       valueAddress=null 
-       form()
+      
+      else {
+         errorAdress.innerHTML="l'adresse ne doit pas contenir de caractère inexistant ?@+ "
+        valueAddress=null
+        form()
       }
   })
 
@@ -263,7 +262,7 @@ editQuantity()
       errorCity.innerHTML=""
       form()
     }
-    else if(!h.target.value.match(/^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i)){
+    else { 
       errorCity.innerHTML="la ville ne doit pas contenir de nombre/caractère inexistant ?@+ et doit contenir plus d'un caractère"
       valueCity=null
       form()
@@ -284,6 +283,10 @@ editQuantity()
       valueEmail=null
       form()
     }
+    else {
+      valueEmail=null
+      form()
+    }
   })
 //--------------------------------------------------------------
 // envoie donnée du formulaire dans localstorage
@@ -298,19 +301,24 @@ function form() {
     email: null
   };
   //si respecte regex apparais pas comme null
-  if (valueFirstName !== null) {
+  
+  if (valueFirstName !== null ) {
     contact.firstName = document.querySelector("#firstName").value;
   }
-  if (valueLastName !== null) {
+  if (valueLastName !== null ) {
+ 
     contact.lastName = document.querySelector("#lastName").value;
   }
-  if (valueAddress !== null) {
+  if (valueAddress !== null ) {
+    
     contact.address = document.querySelector("#address").value;
   }
-  if (valueCity !== null) {
+  if (valueCity !== null ) {
+    
     contact.city = document.querySelector("#city").value;
   }
-  if (valueEmail !== null) {
+  if (valueEmail !== null  ) {
+    
     contact.email = document.querySelector("#email").value;
   }
   localStorage.setItem("contact", JSON.stringify(contact));
@@ -347,10 +355,9 @@ products=basketId
   // info formulaire + id
   let foundContact= basket.find(contact=>contact.firstName!=null && contact.lastName!=null &&
     contact.address!=null && contact.city!=null && contact.email!=null)
-await form();
-  btnForm.addEventListener("click",(e)=>{
-
-    
+    await form();
+  
+    btnForm.addEventListener("click",(e)=>{
 
   let order =JSON.parse(localStorage.getItem("contact"))
 let contact={
@@ -364,10 +371,9 @@ let formBasket={
 contact,
 products
 }
-
-    
     //si les valuers contact ne sont pas nul alors envoyer les donner aux serveur 
- if(foundContact==undefined){
+ if( order.firstName !== null && order.lastName !== null && order.address !== null 
+  && order.city !== null && order.email !== null){
  e.preventDefault() 
  //envoie des donner au serveur pour récupérer id de commande et information du produit
  fetch("http://localhost:3000/api/products/order", {
@@ -399,3 +405,17 @@ alert("veuiller remplir le formulaire")
   })
 }
 confirmForm()
+
+
+
+// Réinitialiser tous les champs de texte
+function resetForm() {
+  const formFields = document.querySelectorAll('.cart__order__form__question input');
+  formFields.forEach(field => {
+    field.value = '';
+  });
+  localStorage.removeItem('contact');
+}
+
+// si page actualise les champ ce vide 
+window.addEventListener('load', resetForm);
