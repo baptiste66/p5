@@ -67,7 +67,7 @@ let productColor;
 
 let quantity = document.getElementById("quantity");
 let productQuantity;
-//remet la valeur 0 quand ont actualise lapage empêche le bug de la quantiter deja selectionner 
+//remet la valeur 0 quand actualise la page empêche le bug de la quantiter deja selectionner 
 quantity.value = 0
 quantity.addEventListener("input", (q) => {
   productQuantity =q.data;
@@ -81,7 +81,6 @@ quantity.addEventListener("input", (q) => {
 
 // conditions de la selection du produit + message d'erreur
 //------------------------------------------------------------------------
-
 // déclaration variable
 let addProduct= document.getElementById("addToCart");
 // condition pour ajouter au panier

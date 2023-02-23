@@ -1,10 +1,10 @@
 //récupération local storage
 let basket = JSON.parse(localStorage.getItem("product"))
 
-// fonction affichage des produits dans le panier
-//----------------------------------------------------------
-let dataList=[];
 
+let dataList=[];
+//récupère les donner de l'api 
+//-------------------
 async function data() {
   let dataList = [];
   for (let i = 0; i < basket.length; i++) {
@@ -26,7 +26,8 @@ async function data() {
   return dataList;
 }
 
-
+// fonction affichage des produits dans le panier
+//----------------------------------------------------------
 async function basketDisplay(){ 
   let basket =JSON.parse(localStorage.getItem("product"))
   
@@ -184,10 +185,6 @@ if(basket[i].id === quant.dataset.id &&quant.dataset.color === basket[i].color &
 editQuantity()
 
 
-
-
-
-
 //--------------------------------------------------------------
 // regex du formulaire
 
@@ -289,9 +286,8 @@ editQuantity()
     }
   })
 //--------------------------------------------------------------
-// envoie donnée du formulaire dans localstorage
+// envoie donnée du formulaire dans localstorage et les vérifie
 
-// envoie donnée du formulaire dans localstorage
 function form() {
   let contact = {
     firstName: null,
@@ -301,7 +297,6 @@ function form() {
     email: null
   };
   //si respecte regex apparais pas comme null
-  
   if (valueFirstName !== null ) {
     contact.firstName = document.querySelector("#firstName").value;
   }
@@ -325,10 +320,7 @@ function form() {
   console.log(contact);
 }
 
-// Appeler form() pour enregistrer les données initiales dans le localStorage
 form();
-
-
 
 //--------------------------------------------------------------
 // envoie id des produit dans tableaux
@@ -346,8 +338,6 @@ products=basketId
 
 //--------------------------------------------------------------
 // envoie des donnée aux back end pour récupérer info du produit
-
-
 
 //function d'envoie qui dirige a la page confimation
  async function confirmForm(){
